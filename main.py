@@ -67,7 +67,7 @@ def heuristic(node, goal):
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 def read_maze():
-    with open('mazes/maze8x8.txt', 'r') as f:
+    with open('maze.txt', 'r') as f:
         maze_size = int(f.readline())
         squares = [[0 for j in range(maze_size)] for i in range(maze_size)]
         for i in range(maze_size):
@@ -87,6 +87,7 @@ def read_maze():
 def main():
     # Use a breakpoint in the code line below to debug your script.
 
+    # TODO:
     # TODO:
     maze = read_maze()
     print(maze)
