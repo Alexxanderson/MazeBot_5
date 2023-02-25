@@ -1,7 +1,27 @@
+import copy
 import heapq
 
 prev_value = 0
 count = 1
+
+
+def print_explored(maze, result):
+    print("Optimal Path: ")
+    optimal = result[0]
+    traversed = result[1]
+    for x in traversed:
+        if maze[x[0]][x[1]] != 'S' and maze[x[0]][x[1]] != 'G':
+            maze[x[0]][x[1]] = 'x'
+
+    for x in optimal:
+        if maze[x[0]][x[1]] != 'S' and maze[x[0]][x[1]] != 'G':
+            maze[x[0]][x[1]] = '*'
+
+    for l in maze:
+        for item in l:
+            print(item, end='')
+        print()
+
 
 def greedy_best_first_search(maze, start, goal):
     # initialize frontier and visited set
@@ -24,8 +44,8 @@ def greedy_best_first_search(maze, start, goal):
         # add the current node to the visited set
         visited.add(current)
         print(current)
-        count+=1
-        prev_value = heuristic(current,goal)
+        count += 1
+        prev_value = heuristic(current, goal)
 
         # explore the neighbors of the current node
         for neighbor in get_neighbors(maze, current):
@@ -35,11 +55,9 @@ def greedy_best_first_search(maze, start, goal):
                 # add the neighbor node to the frontier with the priority value
                 heapq.heappush(frontier, (priority, path + [neighbor]))
 
-
-
-
     # if the frontier is empty and the goal node has not been found, return None
     return None, visited
+
 
 def get_neighbors(maze, node):
     # get the row and column of the current node
@@ -58,9 +76,12 @@ def get_neighbors(maze, node):
 
     return neighbors
 
+
 def heuristic(node, goal):
-    # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for bigger mazes
-    return prev_value+abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+    # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for
+    # bigger mazes
+    return prev_value + abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+
 
 # This is a sample Python script.
 
@@ -90,25 +111,31 @@ def main():
     # TODO:
     # TODO:
     maze = read_maze()
+    copied_maze = copy.deepcopy(maze)  # suboptimal, nawawala kasi yung G at S so bandaid solution
     print(maze)
     print(len(maze))
     for l in maze:
         for item in l:
             print(item, end='')
         print()
-    #get start index
-    start_index = [(i,j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'S']
+    # get start index
+    start_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'S']
     # get end index
-    end_index = [(i,j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'G']
+    end_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'G']
     # replace the characters with 0 after getting indexes
     maze[start_index[0][0]][start_index[0][1]] = 0
     maze[end_index[0][0]][end_index[0][1]] = 0
-    #print out the path traveled
+    # print out the path traveled
+    result = greedy_best_first_search(maze, start_index[0], end_index[0])
     print(greedy_best_first_search(maze, start_index[0], end_index[0]), count)
+    print()
+
+    # printing the actual result
+    print_explored(copied_maze, result)
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
