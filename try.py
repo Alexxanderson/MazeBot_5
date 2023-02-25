@@ -19,7 +19,7 @@ def print_explored(maze,result):
         print()
 
 def read_maze():
-    with open('maze.txt', 'r') as f:
+    with open('mazes/maze5x5.txt', 'r') as f:
         maze_size = int(f.readline())
         squares = [[0 for j in range(maze_size)] for i in range(maze_size)]
         for i in range(maze_size):
