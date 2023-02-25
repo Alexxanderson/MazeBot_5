@@ -63,16 +63,18 @@ def print_explored_gui(maze, result):
 
         draw_maze(screen, maze, block_size)
         pygame.display.update()
-        time.sleep(0.2)
+        time.sleep(0.1)
+    if result[0] != None:
+        # draw search path
+        optimal = result[0]
+        # draw optimal path
+        for x in optimal:
+            if maze[x[0]][x[1]] != 'S' and maze[x[0]][x[1]] != 'G':
+                maze[x[0]][x[1]] = '*'
 
-    # draw optimal path
-    for x in optimal:
-        if maze[x[0]][x[1]] != 'S' and maze[x[0]][x[1]] != 'G':
-            maze[x[0]][x[1]] = '*'
-
-        draw_maze(screen, maze, block_size)
-        pygame.display.update()
-        time.sleep(0.2)
+            draw_maze(screen, maze, block_size)
+            pygame.display.update()
+            time.sleep(0.1)
 
     # wait for user to quit
     running = True
@@ -155,7 +157,7 @@ def heuristic(node, goal):
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 def read_maze():
-    with open('mazes/maze19x19.txt', 'r') as f:
+    with open('mazes/nogoal.txt', 'r') as f:
         maze_size = int(f.readline())
         squares = [[0 for j in range(maze_size)] for i in range(maze_size)]
         for i in range(maze_size):
@@ -189,6 +191,7 @@ def main():
     maze[end_index[0][0]][end_index[0][1]] = 0
     # print out the path traveled
     result = search(maze, start_index[0], end_index[0])
+    # bring back S and G
     maze[start_index[0][0]][start_index[0][1]] = 'S'
     maze[end_index[0][0]][end_index[0][1]] = 'G'
     # printing the actual result
