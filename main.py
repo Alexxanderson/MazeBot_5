@@ -1,5 +1,6 @@
 import copy
 import heapq
+import math
 
 prev_value = 0
 count = 1
@@ -45,13 +46,13 @@ def greedy_best_first_search(maze, start, goal):
         visited.add(current)
         print(current)
         count += 1
-        prev_value = heuristic(current, goal)
+        prev_value = heuristic(current, goal, start)
 
         # explore the neighbors of the current node
         for neighbor in get_neighbors(maze, current):
             if neighbor not in visited:
                 # calculate the heuristic priority value for the neighbor node
-                priority = heuristic(neighbor, goal)
+                priority = heuristic(neighbor, goal, start)
                 # add the neighbor node to the frontier with the priority value
                 heapq.heappush(frontier, (priority, path + [neighbor]))
 
@@ -77,10 +78,13 @@ def get_neighbors(maze, node):
     return neighbors
 
 
-def heuristic(node, goal):
+def heuristic(node, goal, start):
     # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for
     # bigger mazes
-    return prev_value + abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+    return math.floor(math.sqrt((node[0] - start[0]) ** 2 + (node[1] - start[1]) ** 2) * 10) + math.floor(
+        math.sqrt((node[0] - goal[0]) ** 2 + (node[1] - goal[1]) ** 2) * 10)
+    #+ abs(node[0] - start[0]) + abs(node[1] - start[1]) * 10
+    #return prev_value + abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 
 # This is a sample Python script.
