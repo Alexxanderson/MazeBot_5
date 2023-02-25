@@ -51,9 +51,6 @@ def print_explored_gui(maze, result):
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Maze Solver")
 
-    # initialize clock
-    clock = pygame.time.Clock()
-
     # draw initial maze
     draw_maze(screen, maze, block_size)
 
@@ -154,13 +151,9 @@ def get_neighbors(maze, node):
 def heuristic(node, goal):
     # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for
     # bigger mazes
+    # i think we stick to manhattan - andre
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
-
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 def read_maze():
     with open('mazes/maze19x19.txt', 'r') as f:
         maze_size = int(f.readline())
@@ -180,13 +173,8 @@ def read_maze():
 
 # actual main
 def main():
-    # Use a breakpoint in the code line below to debug your script.
 
-    # TODO:
-    # TODO:
     maze = read_maze()
-    copied_maze = copy.deepcopy(maze)  # suboptimal, nawawala kasi yung G at S so bandaid solution
-    print(maze)
     print(len(maze))
     for l in maze:
         for item in l:
@@ -201,9 +189,10 @@ def main():
     maze[end_index[0][0]][end_index[0][1]] = 0
     # print out the path traveled
     result = search(maze, start_index[0], end_index[0])
-
+    maze[start_index[0][0]][start_index[0][1]] = 'S'
+    maze[end_index[0][0]][end_index[0][1]] = 'G'
     # printing the actual result
-    print_explored_gui(copied_maze, result)
+    print_explored_gui(maze, result)
 
 
 # Press the green button in the gutter to run the script.
