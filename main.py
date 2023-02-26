@@ -1,4 +1,3 @@
-import copy
 import heapq
 import math
 import time
@@ -39,7 +38,6 @@ def draw_maze(screen, maze, block_size):
                 pygame.draw.rect(screen, BLACK, rect)
                 pygame.draw.rect(screen, BLACK, rect, 2)
 
-
 def print_explored_gui(maze, result):
     # initialize Pygame
     pygame.init()
@@ -48,14 +46,20 @@ def print_explored_gui(maze, result):
     block_size = 40
     width = len(maze[0]) * block_size
     height = len(maze) * block_size
-    screen = pygame.display.set_mode((width, height))
+    screen = pygame.display.set_mode((width+300, height))
     pygame.display.set_caption("Maze Solver")
+
+    font = pygame.font.SysFont('Arial',25)
+
+
+    def screenmessage(msg,color, height):
+        screen_text = font.render(msg, True, color)
+        screen.blit(screen_text, (width, height))
 
     # draw initial maze
     draw_maze(screen, maze, block_size)
 
     # draw search path
-    optimal = result[0]
     traversed = result[1]
     for x in traversed:
         if maze[x[0]][x[1]] != 'S' and maze[x[0]][x[1]] != 'G':
@@ -82,6 +86,10 @@ def print_explored_gui(maze, result):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        screenmessage("Maze size: "+str(len(maze))+"x"+str(len(maze)), (255, 255, 255), 0)
+        screenmessage("Optimal Path Length: "+(str(len(result[0])-2) if result[0] != None else "No solution"), (255, 255, 255), 30)
+        screenmessage("Traversed Path Length: "+str(len(result[1])-1), (255, 255, 255), 60)
+        pygame.display.update()
 
     pygame.quit()
 
@@ -131,7 +139,6 @@ def search(maze, start, goal):
     # if the frontier is empty and the goal node has not been found, return None
     return None, visited
 
-
 def get_neighbors(maze, node):
     # get the row and column of the current node
     row, col = node
@@ -149,7 +156,6 @@ def get_neighbors(maze, node):
 
     return neighbors
 
-
 def heuristic(node, goal):
     # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for
     # bigger mazes
@@ -157,7 +163,7 @@ def heuristic(node, goal):
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 def read_maze():
-    with open('mazes/nogoal.txt', 'r') as f:
+    with open('mazes/maze19x19.txt', 'r') as f:
         maze_size = int(f.readline())
         squares = [[0 for j in range(maze_size)] for i in range(maze_size)]
         for i in range(maze_size):
@@ -171,7 +177,6 @@ def read_maze():
                     squares[i][j] = string[j]
 
     return squares
-
 
 # actual main
 def main():
@@ -194,7 +199,7 @@ def main():
     # bring back S and G
     maze[start_index[0][0]][start_index[0][1]] = 'S'
     maze[end_index[0][0]][end_index[0][1]] = 'G'
-    # printing the actual result
+    # printing the maze
     print_explored_gui(maze, result)
 
 
