@@ -4,22 +4,22 @@ import time
 import pygame
 from collections import OrderedDict
 
+
 def draw_maze(screen, maze, block_size):
     # define colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
-    GRAY = (128, 128, 128)
+    GRAY = (75, 75, 75)
     GREEN = (0, 255, 0)
-    RED = (255, 0, 0)
-    BLUE = (0, 0, 255)
-    YELLOW = (255,255,0)
-    ORANGE = (255,165,0)
+    YELLOW = (255, 255, 0)
+    ORANGE = (255, 165, 0)
+    LIGHTORANGE = (200, 200, 100)
 
     # draw maze as a grid
     for i in range(len(maze)):
         for j in range(len(maze[i])):
             rect = pygame.Rect(j * block_size, i * block_size, block_size, block_size)
-            if maze[i][j] == 1:  # wall
+            if maze[i][j] == '#':  # wall
                 pygame.draw.rect(screen, WHITE, rect)
                 pygame.draw.rect(screen, BLACK, rect, 2)
             elif maze[i][j] == 'S':  # start
@@ -29,7 +29,7 @@ def draw_maze(screen, maze, block_size):
                 pygame.draw.rect(screen, GREEN, rect)
                 pygame.draw.rect(screen, BLACK, rect, 2)
             elif maze[i][j] == 'x':  # traversed
-                pygame.draw.rect(screen, BLUE, rect)
+                pygame.draw.rect(screen, LIGHTORANGE, rect)
                 pygame.draw.rect(screen, BLACK, rect, 2)
             elif maze[i][j] == '*':  # optimal path
                 pygame.draw.rect(screen, ORANGE, rect)
@@ -38,23 +38,23 @@ def draw_maze(screen, maze, block_size):
                 pygame.draw.rect(screen, GRAY, rect)
                 pygame.draw.rect(screen, BLACK, rect, 2)
 
+
 def print_explored_gui(maze, result):
     # initialize Pygame
     pygame.init()
 
     # set up screen
-    block_size = 50 // (size/10)
+    block_size = 50 // (len(maze) / 10)
     width = len(maze[0]) * block_size
     height = len(maze) * block_size
-    screen = pygame.display.set_mode((width+300, height))
+    screen = pygame.display.set_mode((width + 300, height))
     pygame.display.set_caption("Maze Solver")
 
-    font = pygame.font.SysFont('Arial',25)
+    font = pygame.font.SysFont('Arial', 23)
 
-
-    def screenmessage(msg,color, height):
+    def screenmessage(msg, color, textheight):
         screen_text = font.render(msg, True, color)
-        screen.blit(screen_text, (width, height))
+        screen.blit(screen_text, (width, textheight))
 
     # draw initial maze
     draw_maze(screen, maze, block_size)
@@ -67,8 +67,8 @@ def print_explored_gui(maze, result):
 
         draw_maze(screen, maze, block_size)
         pygame.display.update()
-        time.sleep(0.1)
-    if result[0] != None:
+        time.sleep(0.03)
+    if result[0] is not None:
         # draw search path
         optimal = result[0]
         # draw optimal path
@@ -78,7 +78,7 @@ def print_explored_gui(maze, result):
 
             draw_maze(screen, maze, block_size)
             pygame.display.update()
-            time.sleep(0.1)
+            time.sleep(0.03)
 
     # wait for user to quit
     running = True
@@ -86,12 +86,14 @@ def print_explored_gui(maze, result):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        screenmessage("Maze size: "+str(len(maze))+"x"+str(len(maze)), (255, 255, 255), 0)
-        screenmessage("Optimal Path Length: "+(str(len(result[0])-2) if result[0] != None else "No solution"), (255, 255, 255), 30)
-        screenmessage("Traversed Path Length: "+str(len(result[1])-1), (255, 255, 255), 60)
+        screenmessage("Maze size: " + str(len(maze)) + "x" + str(len(maze)), (255, 255, 255), 0)
+        screenmessage("Optimal Path Length: " + (str(len(result[0]) - 2) if result[0] is not None else "No solution"),
+                      (255, 255, 255), 30)
+        screenmessage("Traversed Path Length: " + str(len(result[1]) - 1), (255, 255, 255), 60)
         pygame.display.update()
 
     pygame.quit()
+
 
 def search(maze, start, goal):
     # initialize frontier, visited set, and cost dictionary
@@ -100,7 +102,7 @@ def search(maze, start, goal):
     cost = {}
 
     # add start node to the frontier with a priority value of 0
-    heapq.heappush(frontier, (0, start))
+    heapq.heappush(frontier, (0, 0, start))
     cost[start] = (0, None)
 
     for i in range(len(maze)):
@@ -109,8 +111,7 @@ def search(maze, start, goal):
                 cost[(i, j)] = (math.inf, None)
 
     while frontier:
-        # get the node with the lowest priority value
-        _, current = heapq.heappop(frontier)
+        _, _, current = heapq.heappop(frontier)
 
         # check if the current node is the goal node
         if current == goal:
@@ -119,7 +120,7 @@ def search(maze, start, goal):
             while current in cost:
                 path.append(current)
                 current = cost[current][1]
-            return list(reversed(path)), list(visited)
+            return list(path), list(visited)
 
         # add the current node to the visited set
         visited[current] = None
@@ -132,18 +133,19 @@ def search(maze, start, goal):
             if tentative_cost < cost[neighbor][0]:
                 # update the actual cost and parent node for the neighbor node
                 cost[neighbor] = (tentative_cost, current)
-                priority = tentative_cost + heuristic(neighbor, goal)
+                hscore = heuristic(neighbor, goal)
+                priority = tentative_cost + hscore
                 # add the neighbor node to the frontier with the priority value
-                heapq.heappush(frontier, (priority, neighbor))
+                heapq.heappush(frontier, (priority, hscore, neighbor))
 
     # if the frontier is empty and the goal node has not been found, return None
     return None, visited
+
 
 def get_neighbors(maze, node):
     # get the row and column of the current node
     row, col = node
 
-    # define the possible moves from the current node
     moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
     # check each possible move and add valid neighbors to the list
@@ -151,51 +153,48 @@ def get_neighbors(maze, node):
     for move in moves:
         new_row = row + move[0]
         new_col = col + move[1]
-        if 0 <= new_row < len(maze) and 0 <= new_col < len(maze[0]) and maze[new_row][new_col] == 0:
+        if 0 <= new_row < len(maze) and 0 <= new_col < len(maze[0]) and maze[new_row][new_col] == '.':
             neighbors.append((new_row, new_col))
 
     return neighbors
 
+
 def heuristic(node, goal):
-    # need to change the heuristic calc, this is just manhattan distance, good for small mazes but very bad for
-    # bigger mazes
-    # i think we stick to manhattan - andre
+    # heuristic just manhattan
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
+
 def read_maze():
-    with open('maze.txt', 'r') as f:
+    # Modify the string below to the file name including the .txt extension
+    file = 'mazes/maze-17.txt'  # change this string
+
+    # Open file and create a 2d list representing the maze
+    with open(file, 'r') as f:
         maze_size = int(f.readline())
-        global size
-        size = maze_size
         squares = [[0 for j in range(maze_size)] for i in range(maze_size)]
         for i in range(maze_size):
             string = f.readline()
             for j in range(maze_size):
-                if string[j] == ".":
-                    squares[i][j] = 0
-                elif string[j] == "#":
-                    squares[i][j] = 1
-                else:
-                    squares[i][j] = string[j]
+                squares[i][j] = string[j]
 
     return squares
 
+
 # actual main
 def main():
-
     maze = read_maze()
     print(len(maze))
-    for l in maze:
-        for item in l:
+    for i in maze:
+        for item in i:
             print(item, end='')
         print()
     # get start index
     start_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'S']
     # get end index
     end_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'G']
-    # replace the characters with 0 after getting indexes
-    maze[start_index[0][0]][start_index[0][1]] = 0
-    maze[end_index[0][0]][end_index[0][1]] = 0
+    # replace the characters with '.' after getting indexes
+    maze[start_index[0][0]][start_index[0][1]] = '.'
+    maze[end_index[0][0]][end_index[0][1]] = '.'
     # print out the path traveled
     result = search(maze, start_index[0], end_index[0])
     # bring back S and G
