@@ -35,38 +35,8 @@ def read_maze():
     return squares
 
 def main():
-    start_x = 0
-    start_y = 0
-    end_x = 3
-    end_y = 3
-    node_x = 1
-    node_y = 1
-    total = math.floor(math.sqrt((node_x-start_x)**2 + (node_y-start_y)**2) * 10) + math.floor(math.sqrt((node_x-end_x)**2 + (node_y-end_y)**2) * 10)
-    print(total)
-    # print('it works')
-    # result = ([(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4)], {(0, 1), (1, 3), (4, 0), (1, 2), (2, 1), (0, 0), (4, 3), (0, 3), (2, 0), (4, 2), (3, 0), (1, 4), (2, 2), (1, 0), (4, 1)})
-    # print(result)
-    # print("optimal path ", result[0])
-    # print("explored path ", result[1])
-    #
-    # maze = read_maze()
-    #
-    #
-    # #prints the maze in ln
-    # print()
-    # print(maze)
-    # print(len(maze))
-    # print()
-    #
-    # # for actual printing of maze
-    # for l in maze:
-    #     for item in l:
-    #         print(item, end='')
-    #     print()
-    #
-    # print()
-    #
-    # print_explored(maze,result)
+    2**(63+63)
+    return 2 ** (abs(node[0] - goal[0]) + abs(node[1] - goal[1]))
 
 
 
