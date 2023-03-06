@@ -73,7 +73,7 @@ def print_explored_gui(maze, result):
 
         draw_maze(screen, maze, block_size)
         pygame.display.update()
-        time.sleep(0.05)
+        time.sleep(0.02)
     if result[0] is not None:
         # draw search path
         optimal = result[0]
@@ -179,7 +179,7 @@ def heuristic(node, goal):
 # Reads a text file that contains the maze to be sued by the bot and the A* algorithm
 def read_maze():
     # Modify the string below to the file name including the .txt extension
-    file = 'mazes/maze10x10_easy.txt'  # change this string
+    file = 'mazes/wide_maze_2.txt'  # change this string
 
     # Open file and create a 2d list representing the maze
     with open(file, 'r') as f:
