@@ -5,6 +5,9 @@ import pygame
 from collections import OrderedDict
 
 
+# The draw_maze function takes in a 'screen' object, the 'maze' (a 2D list), and the block_size (the size of each
+# cell in the maze). It then draws the maze using rectangles and different colors based on the character in the maze
+# list.
 def draw_maze(screen, maze, block_size):
     # define colors
     BLACK = (0, 0, 0)
@@ -39,6 +42,9 @@ def draw_maze(screen, maze, block_size):
                 pygame.draw.rect(screen, BLACK, rect, 2)
 
 
+# The print_explored_gui function initializes the Pygame screen, calls the draw_maze function to draw the initial maze,
+# and then draws the search path by updating the maze list with 'x' characters for the traversed path and '*' characters
+# for the optimal path. It then sleeps for a short duration and updates the screen to visualize the search path.
 def print_explored_gui(maze, result):
     # initialize Pygame
     pygame.init()
@@ -67,7 +73,7 @@ def print_explored_gui(maze, result):
 
         draw_maze(screen, maze, block_size)
         pygame.display.update()
-        time.sleep(0.03)
+        time.sleep(0.05)
     if result[0] is not None:
         # draw search path
         optimal = result[0]
@@ -95,6 +101,10 @@ def print_explored_gui(maze, result):
     pygame.quit()
 
 
+# It initializes the frontier as a priority queue with the start node, and the visited and cost as an ordered
+# dictionary and dictionary respectively. It then iterates through the nodes in the frontier, adding them to the
+# visited set and exploring their neighbors. If the goal node is found, it returns the path and visited set. Else,
+# it continues iterating through the frontier until it is empty.
 def search(maze, start, goal):
     # initialize frontier, visited set, and cost dictionary
     frontier = []
@@ -142,6 +152,7 @@ def search(maze, start, goal):
     return None, visited
 
 
+# UI
 def get_neighbors(maze, node):
     # get the row and column of the current node
     row, col = node
@@ -159,14 +170,16 @@ def get_neighbors(maze, node):
     return neighbors
 
 
+# The heuristic function simply returns the manhattan distance
 def heuristic(node, goal):
     # heuristic just manhattan
     return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 
+# Reads a text file that contains the maze to be sued by the bot and the A* algorithm
 def read_maze():
     # Modify the string below to the file name including the .txt extension
-    file = 'mazes/maze-17.txt'  # change this string
+    file = 'mazes/maze10x10_easy.txt'  # change this string
 
     # Open file and create a 2d list representing the maze
     with open(file, 'r') as f:
@@ -180,26 +193,33 @@ def read_maze():
     return squares
 
 
-# actual main
+# Actual main function
 def main():
+    # read txt file and print 2d maze grid
     maze = read_maze()
     print(len(maze))
     for i in maze:
         for item in i:
             print(item, end='')
         print()
-    # get start index
+
+    # get initial state index
     start_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'S']
-    # get end index
+
+    # get goal state index
     end_index = [(i, j) for i, row in enumerate(maze) for j, val in enumerate(row) if val == 'G']
+
     # replace the characters with '.' after getting indexes
     maze[start_index[0][0]][start_index[0][1]] = '.'
     maze[end_index[0][0]][end_index[0][1]] = '.'
+
     # print out the path traveled
     result = search(maze, start_index[0], end_index[0])
+
     # bring back S and G
     maze[start_index[0][0]][start_index[0][1]] = 'S'
     maze[end_index[0][0]][end_index[0][1]] = 'G'
+
     # printing the maze
     print_explored_gui(maze, result)
 
